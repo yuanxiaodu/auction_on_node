@@ -1,24 +1,26 @@
 extends ../layout
 block title
-  title!=title
+    title!=title
 block content
-  form(class='form-horizontal', method='post', action='#')
-    fieldset
-      legend 后台管理登录
-      .form-group
-        label(class='control-label col-sm-2' for='username') 用户名
-        .col-sm-3
-          input(type='text', class='form-control', id='username', name='username', placeholder='用户名', required, autofocus )
-      .form-group
-        label(class='control-label col-sm-2' for='password') 密码
-        .col-sm-3
-          input(type='password', class='form-control', id='password', name='password', placeholder='密码' required)
-      .form-group
-        div(class='col-sm-offset-2 col-sm-4')
-          .checkbox
-            label
-              input(type='checkbox', checked, id='remember' name='remember')
-              | 记住我
-      .form-group
-        div(class='col-sm-offset-2 col-sm-4')
-          button(type='submit', class='btn btn-primary') 登录
+    if msg
+
+    form(class='form-horizontal', method='post', action='/manage/doLogin')
+        fieldset
+            legend 后台管理登录
+            .form-group
+                label(class='control-label col-sm-2' for='username') 用户名
+                .col-sm-3
+                    input(type='text', class='form-control', id='username', name='username', placeholder='用户名', required, autofocus )
+            .form-group
+                label(class='control-label col-sm-2' for='password') 密码
+                .col-sm-3
+                    input(type='password', class='form-control', id='password', name='password', placeholder='密码' required)
+            .form-group
+                div(class='col-sm-offset-2 col-sm-4')
+                    .checkbox
+                        label
+                            input(type='checkbox', checked, id='remember' name='remember')
+                            | 记住我
+            .form-group
+                div(class='col-sm-offset-2 col-sm-4')
+                    button(type='submit', class='btn btn-primary') 登录

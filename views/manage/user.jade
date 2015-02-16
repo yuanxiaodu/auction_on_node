@@ -1,37 +1,12 @@
 extends ../layout
-block append script
-    script(src='/javascripts/jquery.form.min.js')
 block title
     title!=title
-    script(type='text/javascript').
-        $(document).ready(function () {
-            $('#login_form').ajaxForm(function (responseJSON) {
-                if (responseJSON.code == 'failed') {
-                    $('#login_err').html(responseJSON.msg).addClass('alert alert-danger')
-                } else if (responseJSON.code == 'success') {
-                    window.location.href = '/manage/user'
-                }
-            })
-        });
-block content
-    form(class='form-horizontal', method='post', action='/manage/login', id='login_form')
-        fieldset
-            legend 后台管理登录
-            #login_err
-            .form-group
-                label(class='control-label col-sm-2' for='username') 用户名
-                .col-sm-3
-                    input(type='text', class='form-control', id='username', name='username', placeholder='用户名', required, autofocus )
-            .form-group
-                label(class='control-label col-sm-2' for='password') 密码
-                .col-sm-3
-                    input(type='password', class='form-control', id='password', name='password', placeholder='密码' required)
-            .form-group
-                div(class='col-sm-offset-2 col-sm-4')
-                    .checkbox
-                        label
-                            input(type='checkbox', checked, id='remember' name='remember')
-                            | 记住我
-            .form-group
-                div(class='col-sm-offset-2 col-sm-4')
-                    button(type='submit', class='btn btn-primary') 登录
+block prepend header
+    nav
+        ul(class='nav nav-pills pull-right')
+            li.active
+                a(href='/manage/user') 资料管理
+            li
+                a(href='/manage/products') 商品管理
+            li
+                a(href='/manage/logout') 注销

@@ -1,18 +1,20 @@
 doctype html
 html(lang='zh-CN')
-  head
-    meta(charset='utf-8')
-    meta(http-equiv='X-UA-Compatible', content='IE-edge')
-    meta(name='viewport', content='width=device-width, initial-scale=1')
-    block title
-      title 萝卜拍卖
-  link(rel='stylesheet', href='/stylesheets/bootstrap.min.css')
-  link(rel='stylesheet', href='/stylesheets/style.css')
-  body
-    .container
-      .header
-        block header
-      block content
-      footer &copy;2015<a href="http://luoboloop.com">Luoboloop</a>.
-  script(src='http://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js')
-  script(src='http://apps.bdimg.com/libs/bootstrap/3.3.0/js/bootstrap.min.js')
+    head
+        meta(charset='utf-8')
+        meta(http-equiv='X-UA-Compatible', content='IE-edge')
+        meta(name='viewport', content='width=device-width, initial-scale=1')
+        block css
+            link(rel='stylesheet', href='/stylesheets/bootstrap.min.css')
+            link(rel='stylesheet', href='/stylesheets/style.css')
+        block script
+            script(src='http://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js')
+            script(src='http://apps.bdimg.com/libs/bootstrap/3.3.0/js/bootstrap.min.js')
+        block title
+            title 萝卜拍卖
+    body
+        .container
+            .header
+                block header
+            block content
+            footer &copy;2015<a href="http://luoboloop.com">Luoboloop</a>.

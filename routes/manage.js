@@ -6,10 +6,19 @@ var User = require('../models/User');
 //登录验证过滤器
 router.all('*', function (req, res, next) {
     var path = req.path;
-    if (!(/^\/(login)?$/.test(path)) && !req.session.user) {
-        res.redirect('/manage/login');
-    } else {
+    if (/^\/(login)?$/.test(path) || req.session.user) {
         next();
+    } else if (req.cookies.username) {
+        User.findOne({username: req.cookies.username}, function (err, user) {
+            if (err) {
+                console.log(err)
+            } else {
+                req.session.user = user;
+                next();
+            }
+        })
+    } else {
+        res.redirect('/manage/login');
     }
 });
 
@@ -17,18 +26,7 @@ router.get(/^\/(login)?$/, function (req, res) {
     if (req.session.user) {
         res.redirect('/manage/products');
     } else {
-        if (req.cookies.username) {
-            User.findOne({username: req.cookies.username}, function (err, user) {
-                if (err) {
-                    console.log(err)
-                } else {
-                    req.session.user = user;
-                    res.redirect('/manage/products');
-                }
-            })
-        } else {
-            res.render('manage/login', {title: '后台管理登录'});
-        }
+        res.render('manage/login', {title: '后台管理登录'});
     }
 });
 
@@ -94,6 +92,57 @@ router.post('/modifyUser', function (req, res) {
                 console.log(err)
             } else {
                 req.session.user = user
+                res.send({code: 'success'})
+            }
+        })
+    }
+});
+
+router.get('/users', function (req, res) {
+    if (req.session.user.type != 1) {
+        res.redirect('/manage/user');
+    } else {
+        User.find({type: {$ne: 1}}, function (err, users) {
+            if (err) {
+                console.log(err)
+            } else {
+                res.render('manage/users', {title: '用户管理', user: req.session.user, users: users});
+            }
+        })
+    }
+});
+
+router.post('/addUser', function (req, res) {
+    if (req.session.user.type != 1) {
+        res.redirect('/manage/user');
+    } else {
+        var user = new User({
+            username: req.body.username,
+            password: 'luoboloop',
+            type: 2,
+            lastModify: new Date,
+            modifier: req.session.user.username
+        })
+        user.save(function (err, user) {
+            if (err) {
+                console.log(err);
+                res.send({code: 'failed', msg: '用户名已存在'})
+            } else {
+                res.send({code: 'success', username: user.username})
+            }
+        })
+    }
+});
+
+router.post('/delUser', function (req, res) {
+    if (req.session.user.type != 1) {
+        res.redirect('/manage/user');
+    } else {
+        User.findOneAndRemove({username: req.body.username}, function (err, user) {
+            if (err) {
+                console.log(err)
+                res.send({code: 'failed', msg: '数据库错误'})
+            } else {
                 res.send({code: 'success'})
             }
         })

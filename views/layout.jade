@@ -17,9 +17,11 @@ html(lang='zh-CN')
                 block nav
         .container
             block content
-        .container
-            hr
-            footer &copy;2015<a href="http://luoboloop.com">Luoboloop</a>.
+        footer.footer
+            .container
+                p.text-muted &copy;2015
+                    a(href='http://luoboloop.com') Luoboloop
+                    |.
     block script
         script(src='http://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js')
         script(src='http://apps.bdimg.com/libs/bootstrap/3.3.0/js/bootstrap.min.js')

@@ -6,7 +6,9 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 //routes
-var manage = require('./routes/manage');
+var login = require('./routes/manage/login');
+var user = require('./routes/manage/user');
+var product = require('./routes/manage/product');
 
 var app = express();
 
@@ -36,7 +38,9 @@ if (app.get('env') === 'production') {
 app.use(session(sess))
 
 //routes
-app.use('/manage', manage);
+app.use('/manage', login);
+app.use('/manage', user);
+app.use('/manage', product);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

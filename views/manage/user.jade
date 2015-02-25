@@ -16,8 +16,8 @@ block nav
 block content
     ol.breadcrumb
         li.active!=title
-    p.text-right
-        a(href='/manage/modifyUser') 修改资料
+    .pull-right
+        a(href='/manage/modifyUser',class='btn btn-primary') 修改资料
     table(class='table table-bordered')
         caption #{user.username}的个人资料
         tbody

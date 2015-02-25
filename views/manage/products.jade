@@ -13,3 +13,50 @@ block nav
                 a(href='/manage/user') 资料管理
             li
                 a(href='/manage/logout') 注销
+block content
+    ol.breadcrumb
+        li.active!=title
+    .container
+        .pull-right
+            a(href='/manage/addProduct', class='btn btn-primary') 添加商品
+        div(class='pull-left col-md-8')
+            form(class='form-form-inline', method='post', action='/manage/products', id='searchForm')
+                .input-group
+                    input(type='text', class='form-control', id='condition', name='condition', placeholder='关键词...', required)
+                    span.input-group-btn
+                        button(type='submit', class='btn btn-primary') 搜索
+    hr
+    table.table
+        thead
+            tr
+                th 商品描述
+                th 起拍价
+                th 状态
+                th 分类
+                th 更新时间
+                th 操作
+        tbody
+        each product in products
+            tr
+                td #{product.description}
+                td #{product.startPrice}
+                td #{product.status}
+                td #{product.catalog}
+                td #{product.lastModify}
+                td 删除
+    .text-center
+        ul(id='paginator')
+
+
+block append script
+    script(src='/javascripts/bootstrap-paginator.min.js')
+    script(type='text/javascript').
+        var options = {
+            currentPage: #{currentPage},
+            totalPages: #{totalPages},
+            bootstrapMajorVersion: 3,
+            pageUrl: function (type, page, current) {
+                return "/manage/products/" + page;
+            }
+        }
+        $('#paginator').bootstrapPaginator(options);

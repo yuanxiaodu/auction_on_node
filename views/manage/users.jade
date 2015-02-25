@@ -18,7 +18,7 @@ block content
         li.active!=title
     .container
         form(class='form-form-inline', method='post', action='/manage/addUser', id='addUserForm')
-            #loginErr
+            #userErr
             .form-group
                 .col-md-6
                     input(type='text', class='form-control', id='username', name='username', placeholder='用户名', required, autofocus )
@@ -41,7 +41,7 @@ block append script
         $(document).ready(function () {
             $('#addUserForm').ajaxForm(function (responseJSON) {
                 if (responseJSON.code == 'failed') {
-                    $('#loginErr').html(responseJSON.msg).addClass('alert alert-danger')
+                    $('#userErr').html(responseJSON.msg).addClass('alert alert-danger')
                 } else if (responseJSON.code == 'success') {
                     $('#users').append('<li class="list-group-item">\
                     <span aria-hidden="true" class="glyphicon glyphicon-user"></span>'
@@ -54,7 +54,7 @@ block append script
         function delUser(username) {
             $.post('/manage/delUser', {username: username}, function (responseJSON) {
                 if (responseJSON.code == 'failed') {
-                    $('#loginErr').html(responseJSON.msg).addClass('alert alert-danger')
+                    $('#userErr').html(responseJSON.msg).addClass('alert alert-danger')
                 } else if (responseJSON.code == 'success') {
                     $('#users li:contains(' + username + ')').remove();
                 }

@@ -46,7 +46,7 @@ block content
             .form-group
                 label(class='control-label col-md-2' for='catalog') 分类
                 .col-md-3
-                    input(type='text', class='form-control', id='catalog', name='catalog', placeholder='起拍时间', required)
+                    input(type='text', class='form-control', id='catalog', name='catalog', placeholder='分类', required)
             .form-group
                 label(class='control-label col-md-2' for='description') 描述
                 .col-md-10
@@ -68,11 +68,12 @@ block append script
             todayBtn: true,
             language: 'zh-CN'
         });
+        var wbbOpt = {
+            lang: 'cn'
+        }
+        $('#description').css('height','300px');
+        $('#description').wysibb(wbbOpt);
         $(document).ready(function () {
-            var wbbOpt = {
-                lang: "cn"
-            }
-            $("#description").wysibb(wbbOpt);
             $('#addProductForm').ajaxForm(function (responseJSON) {
                 if (responseJSON.code == 'failed') {
                     $('#addProductErr').html(responseJSON.msg).addClass('alert alert-danger')

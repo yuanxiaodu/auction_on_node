@@ -6,7 +6,7 @@ var Schema = mongodb.mongoose.Schema;
 var ProductSchema = new Schema({
     description: String,
     catalog: String,
-    pictures: [{uri: String, description: String}],
+    pictures: [String],
     startPrice: Number,
     markup: Number,
     start: Date,

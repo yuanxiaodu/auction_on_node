@@ -25,7 +25,7 @@ block content
                 span.input-group-btn
                     button(type='submit', class='btn btn-primary') 搜索
     hr
-    table.table
+    table.table(class='table-striped')
         thead
             tr
                 th 商品描述
@@ -37,11 +37,14 @@ block content
         tbody
         each product in products
             tr
-                td #{product.description}
+                td.description
+                    a(href='/manage/product/#{product._id}', target="_blank")
+                        img(src='/uploadedImages/#{product.pictures[0].name}', alt='#{product.pictures[0].originalname}', class='img-thumbnail', width='150',height='150')
+                        p #{product.description}
                 td #{product.startPrice}
                 td #{product.status}
                 td #{product.catalog}
-                td #{product.lastModify}
+                td #{product.lastModify.toLocaleString()}
                 td 删除
     .text-center
         ul(id='paginator')

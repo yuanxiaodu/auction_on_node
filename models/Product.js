@@ -4,21 +4,24 @@
 var mongodb = require('./mongodb');
 var Schema = mongodb.mongoose.Schema;
 var ProductSchema = new Schema({
-    description: String,
-    catalog: String,
-    pictures: [String],
+    pictures: [{
+        originalname: String,
+        name: String
+    }],
     startPrice: Number,
     markup: Number,
     start: Date,
     end: Date,
+    catalog: String,
+    description: String,
     status: Number,
+    lastModify: Date,
+    modifier: String,
     bidders: [{
         name: String,
         phone: String,
         price: Number,
         bidTime: Date
-    }],
-    lastModify: Date,
-    modifier: String
+    }]
 });
 module.exports = mongodb.mongoose.model("Product", ProductSchema);

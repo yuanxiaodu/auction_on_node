@@ -29,7 +29,7 @@ block content
             .form-group
                 label(class='control-label col-md-2' for='pictures') 图片
                 .col-md-10
-                    input(class='file', type='file', id='pictures', name='pictures[]', multiple)
+                    input(class='file', type='file', id='pictures', name='pictures', multiple)
             .form-group
                 label(class='control-label col-md-2' for='startPrice') 起拍价
                 .col-md-3
@@ -48,11 +48,11 @@ block content
             .form-group
                 label(class='control-label col-md-2' for='catalog') 分类
                 .col-md-3
-                    input(type='text', class='form-control', id='catalog', name='catalog', placeholder='分类', required)
+                    input(type='text', class='form-control', id='catalog', name='catalog', placeholder='分类')
             .form-group
                 label(class='control-label col-md-2' for='description') 描述
                 .col-md-10
-                    textarea(id='description', name='description', required)
+                    textarea(id='description', name='description')
             .form-group
                 div(class='col-md-offset-2 col-md-6')
                     button(type='submit', class='btn btn-primary') 提交
@@ -89,12 +89,11 @@ block append script
         });
 
         $('#pictures').fileinput({
-            uploadUrl: '/manage/addProduct',
             allowedFileTypes: ['image'],
             maxFileSize: 1000,
             maxFileCount: 9,
-            previewSettings:{
-                image: {width: "auto", height: "116px"}
+            previewSettings: {
+                image: {width: "auto", height: "123px"}
             }
         })
 

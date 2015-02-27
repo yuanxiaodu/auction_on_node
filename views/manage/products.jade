@@ -45,7 +45,7 @@ block content
                 td
                     if product.status == 0
                         | 未上架
-                    if product.status == 1
+                    else if product.status == 1
                         if product.start > new Date
                             | 未开始拍卖
                         else if product.end < new Date

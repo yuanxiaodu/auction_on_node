@@ -30,9 +30,6 @@ router.all('/products(/:page)?', function (req, res) {
         if (err) {
             console.log(err)
         } else {
-            console.log(products)
-            console.log(page)
-            console.log(total)
             res.render('manage/products', {
                 title: '商品管理',
                 user: req.session.user,
@@ -85,14 +82,14 @@ router.post('/addProduct', function (req, res) {
         if (files) {
             if (files.length) {
                 for (var index in files) {
-                    fs.renameSync(files[index].path, fs.realpathSync('../public/uploadedImages/') + '/' + files[index].name)
+                    fs.renameSync(files[index].path, fs.realpathSync('../public/images/') + '/' + files[index].name)
                     pictures.push({
                         originalname: files[index].originalname,
                         name: files[index].name
                     })
                 }
             } else {
-                fs.renameSync(files.path, fs.realpathSync('../public/uploadedImages/') + '/' + files.name)
+                fs.renameSync(files.path, fs.realpathSync('../public/images/') + '/' + files.name)
                 pictures.push({
                     originalname: files.originalname,
                     name: files.name

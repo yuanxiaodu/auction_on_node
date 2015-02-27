@@ -25,12 +25,15 @@ body {
 
 .container {
     width: auto;
-    max-width: 800px;
+    max-width: 1000px;
     padding: 0 15px;
 }
 
 .container .text-muted {
     margin: 20px 0;
+}
+
+.description {
 }
 
 .description a {
@@ -39,12 +42,14 @@ body {
 
 .description img {
     float: left;
+    width: 130px;
 }
 
 .description p {
     float: left;
-    text-overflow: ellipsis;
-    width: 150px;
-    word-wrap: break-word;
+    width: 130px;
+    height: 10em;
     overflow: hidden;
+    word-wrap: break-word;
+    word-break: normal;
 }

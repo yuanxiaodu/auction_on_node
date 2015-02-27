@@ -3,7 +3,7 @@ block title
     title!=title
 block append css
     link(rel='stylesheet', href='/stylesheets/bootstrap-datetimepicker.min.css')
-    link(rel='stylesheet', href='/stylesheets/wbbtheme.css')
+    link(rel='stylesheet', href='/stylesheets/jquery.cleditor.css')
     link(rel='stylesheet', href='/stylesheets/fileinput.min.css')
 
 block nav
@@ -56,12 +56,13 @@ block content
             .form-group
                 div(class='col-md-offset-2 col-md-6')
                     button(type='submit', class='btn btn-primary') 提交
+
+
 block append script
     script(src='/javascripts/jquery.form.min.js')
     script(src='/javascripts/bootstrap-datetimepicker.min.js')
     script(src='/javascripts/bootstrap-datetimepicker.zh-CN.js')
-    script(src='/javascripts/jquery.wysibb.min.js')
-    script(src='/javascripts/jquery.wysibb.cn.js')
+    script(src='/javascripts/jquery.cleditor.min.js')
     script(src='/javascripts/fileinput.min.js')
 
     script(type='text/javascript').
@@ -72,13 +73,9 @@ block append script
             language: 'zh-CN'
         });
 
-        var wbbOpt = {
-            lang: 'cn'
-        }
-        $('#description').css('height', '200px');
-        $('#description').wysibb(wbbOpt);
-
         $(document).ready(function () {
+            $('#description').cleditor();
+
             $('#addProductForm').ajaxForm(function (responseJSON) {
                 if (responseJSON.code == 'failed') {
                     $('#addProductErr').html(responseJSON.msg).addClass('alert alert-danger')
@@ -91,9 +88,10 @@ block append script
         $('#pictures').fileinput({
             allowedFileTypes: ['image'],
             maxFileSize: 1000,
+            showUpload: false,
             maxFileCount: 9,
             previewSettings: {
-                image: {width: "auto", height: "123px"}
+                image: {width: "auto", height: "130px"}
             }
         })
 

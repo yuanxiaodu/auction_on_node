@@ -36,22 +36,40 @@ block content
                 th 操作
         tbody
         each product in products
-            tr
-                td.description
-                    a(href='/manage/product/#{product._id}', target="_blank")
-                        img(src='/uploadedImages/#{product.pictures[0].name}', alt='#{product.pictures[0].originalname}', class='img-thumbnail', width='150',height='150')
-                        p #{product.description}
-                td #{product.startPrice}
-                td #{product.status}
+            tr.description
+                td
+                    a(href='/manage/product/#{product._id}', target='_blank')
+                        img(src='/images/#{product.pictures[0].name}', class='img-thumbnail')
+                        p!=product.description
+                td #{product.startPrice.toFixed(2)}元
+                td
+                    if product.status == 0
+                        | 未上架
+                    if product.status == 1
+                        if product.start > new Date
+                            | 未开始拍卖
+                        else if product.end < new Date
+                            | 已结束拍卖
+                        else
+                            | 正在拍卖
                 td #{product.catalog}
                 td #{product.lastModify.toLocaleString()}
-                td 删除
-    .text-center
+                td
+                    .btn-group
+                        a(href='#', target='_blank', class='btn btn-primary') 预览
+                        a(href='#', class='btn btn-primary') 编辑
+                        if product.status == 1
+                            button(type='button', class='btn btn-primary') 下架
+                        else if product.status == 0
+                            button(type='button', class='btn btn-primary') 上架
+
+.text-center
         ul(id='paginator')
 
 
 block append script
     script(src='/javascripts/bootstrap-paginator.min.js')
+
     script(type='text/javascript').
         var options = {
             currentPage: #{currentPage},

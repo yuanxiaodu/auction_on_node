@@ -1,0 +1,110 @@
+extends ../layout
+block title
+    title!=title
+block append css
+    link(rel='stylesheet', href='/stylesheets/bootstrap-datetimepicker.min.css')
+    link(rel='stylesheet', href='/stylesheets/jquery.cleditor.css')
+    link(rel='stylesheet', href='/stylesheets/fileinput.min.css')
+
+block nav
+    div(class='navbar-collapse collapse')
+        ul(class='nav navbar-nav pull-right')
+            li.active
+                a(href='/manage/products') 商品管理
+            if user.type == 1
+                li
+                    a(href='/manage/users') 用户管理
+            li
+                a(href='/manage/user') 资料管理
+            li
+                a(href='/manage/logout') 注销
+block content
+    ol.breadcrumb
+        li
+            a(href='/manage/products') 商品管理
+        li.active!=title
+    form(class='form-horizontal', method='post', action='/manage/modifyProduct/#{product._id}', id='modifyProductForm', enctype='multipart/form-data')
+        fieldset
+            #modifyProductErr
+            .form-group
+                label(class='control-label col-md-1' for='pictures') 图片
+                .col-md-11
+                    input(class='file', type='file', id='pictures', name='pictures', multiple, required)
+            .form-group
+                label(class='control-label col-md-1' for='startPrice') 起拍价
+                .col-md-3
+                    input(type='text', class='form-control', id='startPrice', name='startPrice', placeholder='起拍价', required, value='#{product.startPrice}')
+            .form-group
+                label(class='control-label col-md-1' for='markup') 加价幅度
+                .col-md-3
+                    input(type='text', class='form-control', id='markup', name='markup', placeholder='加价幅度', required, value='#{product.markup}')
+            .form-group
+                label(class='control-label col-md-1') 拍卖时间
+                .col-md-6
+                    .input-group
+                        input(type='text', class='form-control form_datetime', id='start', name='start', placeholder='起拍时间', required, readonly, value='#{product.start.format("yyyy-MM-dd hh:mm")}')
+                        span.input-group-addon -
+                        input(type='text', class='form-control form_datetime', id='end', name='end', placeholder='结束时间', required, readonly, value='#{product.end.format("yyyy-MM-dd hh:mm")}')
+            .form-group
+                label(class='control-label col-md-1' for='catalog') 分类
+                .col-md-3
+                    input(type='text', class='form-control', id='catalog', name='catalog', placeholder='分类', value='#{product.catalog}')
+            .form-group
+                label(class='control-label col-md-1' for='description') 描述
+                .col-md-11
+                    textarea(id='description', name='description') #{product.description}
+            .form-group
+                div(class='col-md-offset-1 col-md-3')
+                    button(type='submit', class='btn btn-primary') 修改
+    #modified(class='modal fade', tabindex='-1', role='dialog', aria-labelledby='modified', aria-hidden='true')
+        div(class='modal-dialog modal-sm')
+            .modal-content
+                button(type='button', class='close', data-dismiss='modal', aria-label='Close')
+                    span(aria-hidden='true') &times;
+                h4.modal-title(class='alert alert-success') 修改成功
+block append script
+    script(src='/javascripts/jquery.form.min.js')
+    script(src='/javascripts/bootstrap-datetimepicker.min.js')
+    script(src='/javascripts/bootstrap-datetimepicker.zh-CN.js')
+    script(src='/javascripts/jquery.cleditor.min.js')
+    script(src='/javascripts/fileinput.min.js')
+
+    script(type='text/javascript').
+        $('.form_datetime').datetimepicker({
+            format: 'yyyy-mm-dd hh:ii',
+            autoclose: true,
+            todayBtn: true,
+            language: 'zh-CN'
+        });
+
+        $(document).ready(function () {
+            $('#description').cleditor();
+            $('#modifyProductForm').ajaxForm(function (responseJSON) {
+                if (responseJSON.code == 'failed') {
+                    $('#modifyProductErr').html(responseJSON.msg).addClass('alert alert-danger')
+                } else if (responseJSON.code == 'success') {
+                    $('#modified').modal()
+                }
+            })
+        });
+
+        var initialPreview = new Array(),
+                initialPreviewConfig = new Array(),
+                pictures = [#{product.pictures}]
+        console.log(pictures)
+        $('#pictures').fileinput({
+            uploadUrl: '/manage/modifyProduct',
+            allowedFileTypes: ['image'],
+            maxFileSize: 1000,
+            maxFileCount: 9,
+            initialPreview: [
+
+                '<img src="http://www.kodyaz.com/photos/windows_8/images/34677/secondarythumb.aspx " class="file-preview-image">',
+                '<img src="http://www.kodyaz.com/photos/windows_8/images/34676/secondarythumb.aspx " class="file-preview-image">',
+            ],
+            initialPreviewConfig: [
+                {caption: "Desert.jpg", width: "120px", url: "/site/file-delete", key: 1},
+                {caption: "Tulips.jpg", width: "120px", url: "/site/file-delete", key: 2}
+            ]
+        })
+

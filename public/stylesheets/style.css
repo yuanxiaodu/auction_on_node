@@ -23,33 +23,27 @@ body {
     background-color: #f5f5f5;
 }
 
-.container {
-    width: auto;
-    max-width: 1000px;
-    padding: 0 15px;
-}
-
 .container .text-muted {
     margin: 20px 0;
 }
 
-.description {
+.product {
 }
 
-.description a {
+.product a {
     text-decoration: none;
 }
 
-.description img {
+.product img {
     float: left;
-    width: 130px;
+    width: 150px;
 }
 
-.description p {
+.description {
     float: left;
-    width: 130px;
-    height: 10em;
-    overflow: hidden;
+    width: 150px;
+    height: 7em;
     word-wrap: break-word;
     word-break: normal;
+    overflow: hidden;
 }

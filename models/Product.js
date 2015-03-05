@@ -24,4 +24,9 @@ var ProductSchema = new Schema({
         bidTime: Date
     }]
 });
+
+// Ensure virtual fields are serialised.
+ProductSchema.set('toObject', {
+    virtuals: true
+});
 module.exports = mongodb.mongoose.model("Product", ProductSchema);

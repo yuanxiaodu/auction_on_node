@@ -3,8 +3,8 @@ var router = express.Router();
 var fs = require('fs');
 var Product = require('../../models/Product');
 
+var pageSize = 10;
 router.all('/products(/:page)?', function (req, res) {
-    var pageSize = 2;
     var page = req.params.page || '/1'
     page = page.substr(1)
     var total = 0
@@ -13,10 +13,7 @@ router.all('/products(/:page)?', function (req, res) {
         condition = null;
     } else {
         condition = {
-            $or: [
-                {name: new RegExp(condition)},
-                {title: new RegExp(condition)}
-            ]
+            description: new RegExp(condition)
         }
     }
     Product.count(function (err, count) {
@@ -24,19 +21,23 @@ router.all('/products(/:page)?', function (req, res) {
             console.log(err)
         } else {
             total = count
-        }
-    })
-    Product.find(condition, null, {skip: (page - 1) * pageSize, limit: pageSize}, function (err, products) {
-        if (err) {
-            console.log(err)
-        } else {
-            res.render('manage/products', {
-                title: '商品管理',
-                user: req.session.user,
-                products: products,
-                currentPage: page,
-                totalPages: Math.ceil(total / pageSize) || 1
-            });
+            Product.find(condition, null, {
+                skip: (page - 1) * pageSize,
+                limit: pageSize,
+                sort: 'field -lastModify'
+            }, function (err, products) {
+                if (err) {
+                    console.log(err)
+                } else {
+                    res.render('manage/products', {
+                        title: '商品管理',
+                        user: req.session.user,
+                        products: products,
+                        currentPage: page,
+                        totalPages: Math.ceil(total / pageSize) || 1
+                    });
+                }
+            })
         }
     })
 });
@@ -53,48 +54,28 @@ router.post('/addProduct', function (req, res) {
         end = new Date(req.body.end),
         catalog = req.body.catalog,
         description = req.body.description;
-
+    if (!files.length) {
+        files = [files]
+    }
     var preg = /^[1-9]{1}[0-9]{0,10}[.]{0,1}[0-9]{0,2}$/
     if (!preg.test(startPrice) || !preg.test(markup)) {
-        if (files) {
-            if (files.length) {
-                for (var index in files) {
-                    fs.unlinkSync(files[index].path)
-                }
-            } else {
-                fs.unlinkSync(files.path)
-            }
+        for (var index in files) {
+            fs.unlinkSync(files[index].path)
         }
         res.send({code: 'failed', msg: '价格格式为 XX.XX'})
     } else if (start > end) {
-        if (files) {
-            if (files.length) {
-                for (var index in files) {
-                    fs.unlinkSync(files[index].path)
-                }
-            } else {
-                fs.unlinkSync(files.path)
-            }
+        for (var index in files) {
+            fs.unlinkSync(files[index].path)
         }
         res.send({code: 'failed', msg: '起拍时间不能晚于结束时间'})
     } else {
         var pictures = new Array()
-        if (files) {
-            if (files.length) {
-                for (var index in files) {
-                    fs.renameSync(files[index].path, fs.realpathSync('../public/images/') + '/' + files[index].name)
-                    pictures.push({
-                        originalname: files[index].originalname,
-                        name: files[index].name
-                    })
-                }
-            } else {
-                fs.renameSync(files.path, fs.realpathSync('../public/images/') + '/' + files.name)
-                pictures.push({
-                    originalname: files.originalname,
-                    name: files.name
-                })
-            }
+        for (var index in files) {
+            fs.renameSync(files[index].path, fs.realpathSync('../public/images/') + '/' + files[index].name)
+            pictures.push({
+                originalname: files[index].originalname,
+                name: files[index].name
+            })
         }
         var product = new Product({
             pictures: pictures,
@@ -116,6 +97,47 @@ router.post('/addProduct', function (req, res) {
             }
         })
     }
+})
+
+router.get('/modifyProduct/:id/:status', function (req, res) {
+    var id = req.params.id,
+        status = req.params.status,
+        status = status == 0 ? 1 : 0
+    Product.findByIdAndUpdate(id, {
+        status: status,
+        lastModify: new Date,
+        modifier: req.session.user.username
+    }, function (err) {
+        if (err) {
+            console.log(err)
+            res.send({code: 'failed'})
+        } else {
+            res.send({code: 'success'})
+        }
+    })
+})
+
+router.get('/modifyProduct/:id', function (req, res) {
+    var id = req.params.id
+    Product.findById(id, function (err, product) {
+        if (err) {
+            console.log(err)
+        } else {
+            console.log(product)
+            res.render('manage/modifyProduct', {title: '编辑商品', product: product, user: req.session.user});
+        }
+    })
+})
+
+router.post('/modifyProduct/:id', function (req, res) {
+    var id = req.params.id
+    Product.findById(id, function (err, product) {
+        if (err) {
+            console.log(err)
+        } else {
+            res.send({code: 'success'})
+        }
+    })
 })
 
 module.exports = router;

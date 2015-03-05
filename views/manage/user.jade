@@ -16,23 +16,26 @@ block nav
 block content
     ol.breadcrumb
         li.active!=title
-    .pull-right
-        a(href='/manage/modifyUser',class='btn btn-primary') 修改资料
-    table(class='table table-bordered')
-        caption #{user.username}的个人资料
-        tbody
-            tr
-                td 用户名
-                td #{user.username}
-            tr
-                td 电子邮件
-                td #{user.email}
-            tr
-                td 电话
-                td #{user.phone}
-            tr
-                td 权限
-                if user.type == 1
-                    td 超级管理员
-                else if user.type == 2
-                    td 普通管理员
+
+    .container
+        .col-md-6(class='col-md-offset-2')
+            .pull-right
+                a(href='/manage/modifyUser',class='btn btn-primary') 修改资料
+            table(class='table table-bordered')
+                caption #{user.username}的个人资料
+                tbody
+                    tr
+                        td 用户名
+                        td #{user.username}
+                    tr
+                        td 电子邮件
+                        td #{user.email}
+                    tr
+                        td 电话
+                        td #{user.phone}
+                    tr
+                        td 权限
+                        if user.type == 1
+                            td 超级管理员
+                        else if user.type == 2
+                            td 普通管理员

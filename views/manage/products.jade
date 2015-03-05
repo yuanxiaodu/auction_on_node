@@ -17,13 +17,14 @@ block content
     ol.breadcrumb
         li.active!=title
     .container
-        .pull-right
+        .col-md-6
+            form(class='form-inline', method='post', action='/manage/products', id='searchForm')
+                .input-group(class='col-md-12')
+                    input(type='text', class='form-control', id='condition', name='condition', placeholder='关键词...', required)
+                    span.input-group-btn
+                        button(type='submit', class='btn btn-primary') 搜索
+        .col-md-3
             a(href='/manage/addProduct', class='btn btn-primary') 添加商品
-        form(class='form-inline', method='post', action='/manage/products', id='searchForm')
-            .input-group(class='pull-left col-md-8')
-                input(type='text', class='form-control', id='condition', name='condition', placeholder='关键词...', required)
-                span.input-group-btn
-                    button(type='submit', class='btn btn-primary') 搜索
     hr
     table.table(class='table-striped')
         thead
@@ -36,11 +37,11 @@ block content
                 th 操作
         tbody
         each product in products
-            tr.description
+            tr.product
                 td
                     a(href='/manage/product/#{product._id}', target='_blank')
                         img(src='/images/#{product.pictures[0].name}', class='img-thumbnail')
-                        p!=product.description
+                        .description!=product.description
                 td #{product.startPrice.toFixed(2)}元
                 td
                     if product.status == 0
@@ -53,17 +54,17 @@ block content
                         else
                             | 正在拍卖
                 td #{product.catalog}
-                td #{product.lastModify.toLocaleString()}
+                td #{product.lastModify.format('yyyy-MM-dd hh:mm')}
                 td
                     .btn-group
-                        a(href='#', target='_blank', class='btn btn-primary') 预览
-                        a(href='#', class='btn btn-primary') 编辑
+                        a(href='#', target='_blank', class='btn btn-info') 预览
+                        a(href='/manage/modifyProduct/#{product._id}', class='btn btn-warning') 编辑
                         if product.status == 1
-                            button(type='button', class='btn btn-primary') 下架
+                            button(type='button', class='btn btn-danger', onclick='changeStatus("{#{product._id}", #{product.status})') 下架
                         else if product.status == 0
-                            button(type='button', class='btn btn-primary') 上架
+                            button(type='button', class='btn btn-success', onclick='changeStatus("#{product._id}", #{product.status})') 上架
 
-.text-center
+    .text-center
         ul(id='paginator')
 
 
@@ -80,3 +81,13 @@ block append script
             }
         }
         $('#paginator').bootstrapPaginator(options);
+
+        function changeStatus(id, status) {
+            $.get('/manage/modifyProduct/' + id + '/' + status, function (responseJSON) {
+                if (responseJSON.code == 'failed') {
+                    alert('服务器错误')
+                } else if (responseJSON.code == 'success') {
+                    window.location.href = '/manage/products'
+                }
+            })
+        }

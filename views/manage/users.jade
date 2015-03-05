@@ -17,24 +17,26 @@ block content
     ol.breadcrumb
         li.active!=title
     .container
-        form(class='form-form-inline', method='post', action='/manage/addUser', id='addUserForm')
-            #userErr
-            .form-group
-                .col-md-6
-                    input(type='text', class='form-control', id='username', name='username', placeholder='用户名', required, autofocus )
-            .form-group
-                .col-md-3
-                    button(type='submit', class='btn btn-primary') 添加
-    hr
+        .col-md-6(class='col-md-offset-2')
+            form(class='form-form-inline', method='post', action='/manage/addUser', id='addUserForm')
+                #userErr
+                .form-group
+                    .col-md-9
+                        input(type='text', class='form-control', id='username', name='username', placeholder='用户名', required, autofocus )
+                .form-group
+                    .col-md-3
+                        button(type='submit', class='btn btn-primary') 添加
     .container
-        ul(class='list-group col-md-8', id='users')
-            each user in users
-                li.list-group-item
-                    span(class='glyphicon glyphicon-user', aria-hidden='true')
-                    | #{user.username}
-                    a(class='pull-right', href='javascript:delUser("#{user.username}")')
-                        span(class='glyphicon glyphicon-remove', aria-hidden='true')
-                        | 删除
+        .col-md-6(class='col-md-offset-2')
+            hr
+            ul(class='list-group', id='users')
+                each user in users
+                    li.list-group-item
+                        span(class='glyphicon glyphicon-user', aria-hidden='true')
+                        | #{user.username}
+                        a(class='pull-right', href='javascript:delUser("#{user.username}")')
+                            span(class='glyphicon glyphicon-remove', aria-hidden='true')
+                            | 删除
 block append script
     script(src='/javascripts/jquery.form.min.js')
     script(type='text/javascript').
@@ -48,6 +50,8 @@ block append script
                     + responseJSON.username +
                     '<a href="javascript:delUser(\'' + responseJSON.username + '\')" class="pull-right">\
                     <span aria-hidden="true" class="glyphicon glyphicon-remove"></span>删除</a></li>')
+                    $('#userErr').empty()
+                    $('#userErr').removeClass()
                 }
             })
         });
@@ -57,6 +61,8 @@ block append script
                     $('#userErr').html(responseJSON.msg).addClass('alert alert-danger')
                 } else if (responseJSON.code == 'success') {
                     $('#users li:contains(' + username + ')').remove();
+                    $('#userErr').empty()
+                    $('#userErr').removeClass()
                 }
             })
         }

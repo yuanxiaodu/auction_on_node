@@ -40,7 +40,10 @@ block content
             tr.product
                 td
                     a(href='/manage/product/#{product._id}', target='_blank')
-                        img(src='/images/#{product.pictures[0].name}', class='img-thumbnail')
+                        if product.pictures[0]
+                            img(src='/images/#{product.pictures[0].name}', class='img-thumbnail')
+                        else
+                            img(src='/images/150x150.gif', class='img-thumbnail')
                         .description!=product.description
                 td #{product.startPrice.toFixed(2)}元
                 td

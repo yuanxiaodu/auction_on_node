@@ -29,7 +29,7 @@ block content
             .form-group
                 label(class='control-label col-md-1' for='pictures') 图片
                 .col-md-11
-                    input(class='file', type='file', id='pictures', name='pictures', multiple, required)
+                    input(class='file', type='file', id='pictures', name='pictures', multiple)
             .form-group
                 label(class='control-label col-md-1' for='startPrice') 起拍价
                 .col-md-3
@@ -48,7 +48,8 @@ block content
             .form-group
                 label(class='control-label col-md-1' for='catalog') 分类
                 .col-md-3
-                    input(type='text', class='form-control', id='catalog', name='catalog', placeholder='分类', value='#{product.catalog}')
+                    -var catalog = product.catalog || ''
+                    input(type='text', class='form-control', id='catalog', name='catalog', placeholder='分类', value='#{catalog}')
             .form-group
                 label(class='control-label col-md-1' for='description') 描述
                 .col-md-11
@@ -56,12 +57,6 @@ block content
             .form-group
                 div(class='col-md-offset-1 col-md-3')
                     button(type='submit', class='btn btn-primary') 修改
-    #modified(class='modal fade', tabindex='-1', role='dialog', aria-labelledby='modified', aria-hidden='true')
-        div(class='modal-dialog modal-sm')
-            .modal-content
-                button(type='button', class='close', data-dismiss='modal', aria-label='Close')
-                    span(aria-hidden='true') &times;
-                h4.modal-title(class='alert alert-success') 修改成功
 block append script
     script(src='/javascripts/jquery.form.min.js')
     script(src='/javascripts/bootstrap-datetimepicker.min.js')
@@ -83,28 +78,60 @@ block append script
                 if (responseJSON.code == 'failed') {
                     $('#modifyProductErr').html(responseJSON.msg).addClass('alert alert-danger')
                 } else if (responseJSON.code == 'success') {
-                    $('#modified').modal()
+                    window.location.href = '/manage/products'
                 }
             })
         });
 
         var initialPreview = new Array(),
                 initialPreviewConfig = new Array(),
-                pictures = [#{product.pictures}]
-        console.log(pictures)
+                pictures = !{JSON.stringify(product.pictures)}
+        for (var index in pictures) {
+            var img = '<img src="/images/' + pictures[index].name + '" class="file-preview-image">'
+            initialPreview.push(img)
+            var config = {}
+            config.caption = pictures[index].originalname
+            config.url = "/manage/deletePicture/#{product._id}"
+            config.key = pictures[index].name
+            initialPreviewConfig.push(config)
+        }
         $('#pictures').fileinput({
-            uploadUrl: '/manage/modifyProduct',
+            uploadUrl: '/manage/uploadPicture/#{product._id}',
+            showUpload: false,
             allowedFileTypes: ['image'],
             maxFileSize: 1000,
             maxFileCount: 9,
-            initialPreview: [
-
-                '<img src="http://www.kodyaz.com/photos/windows_8/images/34677/secondarythumb.aspx " class="file-preview-image">',
-                '<img src="http://www.kodyaz.com/photos/windows_8/images/34676/secondarythumb.aspx " class="file-preview-image">',
-            ],
-            initialPreviewConfig: [
-                {caption: "Desert.jpg", width: "120px", url: "/site/file-delete", key: 1},
-                {caption: "Tulips.jpg", width: "120px", url: "/site/file-delete", key: 2}
-            ]
+            initialPreview: initialPreview,
+            initialPreviewConfig: initialPreviewConfig,
+            overwriteInitial: false
         })
+
+        $('#pictures').on('fileuploaderror', function (event, data, previewId, index) {
+            $('button[type="submit"]').attr('disabled', true)
+        });
+
+        $('#pictures').on('fileuploaded', function (event, data, previewId, index) {
+            var picture = data.response.picture
+            var img = '<img src="/images/' + picture.name + '" class="file-preview-image">'
+            initialPreview.push(img)
+            var config = {}
+            config.caption = picture.originalname
+            config.url = "/manage/deletePicture/#{product._id}"
+            config.key = picture.name
+            initialPreviewConfig.push(config)
+        });
+
+        $('#pictures').on('fileclear', function (event) {
+            $('#pictures').fileinput('refresh');
+        });
+
+        $('#pictures').on('fileloaded', function (event, file, previewId, index, reader) {
+            console.log(file)
+        });
+
+
+
+
+
+
 

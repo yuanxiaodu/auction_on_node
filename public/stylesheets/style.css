@@ -47,3 +47,7 @@ body {
     word-break: normal;
     overflow: hidden;
 }
+
+.oldPicturesButton {
+    display: none;
+}

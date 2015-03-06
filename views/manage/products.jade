@@ -19,8 +19,16 @@ block content
     .container
         .col-md-6
             form(class='form-inline', method='post', action='/manage/products', id='searchForm')
-                .input-group(class='col-md-12')
-                    input(type='text', class='form-control', id='condition', name='condition', placeholder='关键词...', required)
+                .input-group.col-md-3
+                    select.form-control(id='status',name='status')
+                        option(value='all') 全部
+                        option(value='no') 未上架
+                        option(value='yes') 已上架
+                        option(value='ongoing') 正在拍卖
+                        option(value='start') 还未开始
+                        option(value='finish') 拍卖结束
+                .input-group(class='col-md-9')
+                    input(type='text', class='form-control', id='search', name='search', placeholder='关键词...')
                     span.input-group-btn
                         button(type='submit', class='btn btn-primary') 搜索
         .col-md-3
@@ -60,21 +68,34 @@ block content
                 td #{product.lastModify.format('yyyy-MM-dd hh:mm')}
                 td
                     .btn-group
-                        a(href='#', target='_blank', class='btn btn-info') 预览
-                        a(href='/manage/modifyProduct/#{product._id}', class='btn btn-warning') 编辑
+                        a(href='#', target='_blank', class='btn btn-default') 预览
                         if product.status == 1
-                            button(type='button', class='btn btn-danger', onclick='changeStatus("{#{product._id}", #{product.status})') 下架
+                            button(type='button', class='btn btn-warning', onclick='changeStatus("#{product._id}", #{product.status})') 下架
                         else if product.status == 0
                             button(type='button', class='btn btn-success', onclick='changeStatus("#{product._id}", #{product.status})') 上架
-
+                        a(href='/manage/modifyProduct/#{product._id}', class='btn btn-info') 编辑
+                        button(type='button', class='btn btn-danger', data-toggle='modal', data-target='#deleteModal', data-productid='#{product._id}') 删除
     .text-center
         ul(id='paginator')
-
-
+    //删除确认对话框
+    #deleteModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='deleteModalLabel', aria-hidden='true')
+        .modal-dialog
+            .modal-content
+                .modal-header
+                    button.close(type='button', data-dismiss='modal', aria-hidden='true') &times;
+                    h4.modal-title 确认删除？
+                .modal-body 将会删除该商品所关联的图片以及所有竞拍信息！
+                .modal-footer
+                    button.btn.btn-default(type='button', data-dismiss='modal') 关闭
+                    button#deleteButton.btn.btn-primary(type='button') 删除
 block append script
     script(src='/javascripts/bootstrap-paginator.min.js')
 
     script(type='text/javascript').
+        $(document).ready(function(){
+            $('#status').val('#{status}')
+        })
+
         var options = {
             currentPage: #{currentPage},
             totalPages: #{totalPages},
@@ -94,3 +115,18 @@ block append script
                 }
             })
         }
+        $('body').on("click", '[data-toggle="modal"]', function () {
+            var productid = $(this).data('productid');
+            $(".modal-footer #deleteButton").data('productid', productid);
+        });
+
+        $('#deleteButton').click(function () {
+            var id = $(this).data('productid')
+            $.post('/manage/deleteProduct/' + id, function (responseJSON) {
+                if (responseJSON.code == 'failed') {
+                    alert('服务器错误')
+                } else if (responseJSON.code == 'success') {
+                    window.location.href = '/manage/products'
+                }
+            })
+        })

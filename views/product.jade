@@ -1,0 +1,73 @@
+extends layout
+block title
+    title!=title
+block nav
+    div(class='navbar-collapse collapse')
+        ul(class='nav navbar-nav pull-right')
+            li.active
+                a(href='/products') 商品列表
+            li
+                a(href='/about') 关于
+block content
+    ol.breadcrumb
+        li
+            a(href='/products') 商品列表
+        li.active!=title
+    .container
+        #pictures.carousel.slide
+            ol.carousel-indicators
+                each picture, index in product.pictures
+                    if index == 0
+                        li.active(data-target='#pictures', data-slide-to='#{index}')
+                    else
+                        li(data-target='#pictures', data-slide-to='#{index}')
+            .carousel-inner
+                each picture, index in product.pictures
+                    if index == 0
+                        .item.active
+                            img(src='/images/#{picture.name}', alt='#{picture.originalname}')
+                    else
+                        .item
+                            img(src='/images/#{picture.name}', alt='#{picture.originalname}')
+            a.left.carousel-control(href='#pictures', data-slide='prev')
+                span.glyphicon.glyphicon-chevron-left(aria-hidden='true')
+                span.sr-only Previous
+            a.right.carousel-control(href='#pictures', data-slide='next')
+                span.glyphicon.glyphicon-chevron-right(aria-hidden='true')
+                span.sr-only Next
+        p!=product.description
+        h4 当前价 99999
+            small.text-muted ￥#{product.startPrice}
+            small craftsman 出价
+        h4 拍卖状态 2008-99-99
+        form(class='form-horizontal', method='post', action='/product/#{product._id}/bid', id='bidForm')
+            fieldset
+                #bidErr
+                .form-group
+                    label(class='control-label col-xs-3' for='price') 出价
+                    .col-xs-9
+                        input(type='text', class='form-control', id='price', name='price', required)
+                .form-group
+                    label(class='control-label col-xs-3' for='name') 姓名
+                    .col-xs-9
+                        input(type='text', class='form-control', id='name', name='name', required)
+                .form-group
+                    label(class='control-label col-xs-3' for='phone') 手机
+                    .col-xs-9
+                        input(type='text', class='form-control', id='phone', name='phone', required=)
+                .form-group
+                    .col-xs-9.col-xs-offset-3
+                        button(type='submit', class='btn btn-primary') 立即出价
+block append script
+    script(src='/javascripts/jquery.form.min.js')
+
+    script(type='text/javascript').
+        $(document).ready(function () {
+            $('#bidForm').ajaxForm(function (responseJSON) {
+                if (responseJSON.code == 'failed') {
+                    $('#bidErr').html(responseJSON.msg).addClass('alert alert-danger')
+                } else if (responseJSON.code == 'success') {
+                    window.location.href = '/product/#{product._id}'
+                }
+            })
+        });

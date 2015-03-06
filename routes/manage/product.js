@@ -8,13 +8,32 @@ router.all('/products(/:page)?', function (req, res) {
     var page = req.params.page || '/1'
     page = page.substr(1)
     var total = 0
-    var condition = req.body.condition
-    if (!condition) {
-        condition = null;
-    } else {
-        condition = {
-            description: new RegExp(condition)
-        }
+    var search = req.body.search
+    var status = req.body.status || 'all'
+    var condition = {}
+
+    if (search) {
+        condition.description = new RegExp(search)
+    }
+    var now = new Date
+    switch (status) {
+        case 'finish':
+            condition.end = {'$lt': now}
+            break
+        case 'start':
+            condition.start = {'$gt': now}
+            break
+        case 'ongoing':
+            condition.end = {'$gt': now}
+            condition.start = {'$lt': now}
+            break
+        case 'yes':
+            condition.status = 1
+            break
+        case 'no':
+            condition.status = 0
+            break
+        default :
     }
     Product.count(function (err, count) {
         if (err) {
@@ -31,6 +50,7 @@ router.all('/products(/:page)?', function (req, res) {
                 } else {
                     res.render('manage/products', {
                         title: '商品管理',
+                        status: status,
                         user: req.session.user,
                         products: products,
                         currentPage: page,
@@ -119,7 +139,7 @@ router.get('/modifyProduct/:id/:status', function (req, res) {
 
 router.get('/modifyProduct/:id', function (req, res) {
     var id = req.params.id
-    Product.findById(id, {}, function (err, product) {
+    Product.findById(id, function (err, product) {
         if (err) {
             console.log(err)
         } else {
@@ -135,8 +155,8 @@ router.post('/modifyProduct/:id', function (req, res) {
         markup = req.body.markup,
         start = new Date(req.body.start),
         end = new Date(req.body.end),
-        catalog = req.body.catalog,
-        description = req.body.description;
+        catalog = req.body.catalog || '',
+        description = req.body.description || '';
     if (files) {
         if (!files.length) {
             files = [files]
@@ -191,9 +211,7 @@ router.post('/modifyProduct/:id', function (req, res) {
                 res.send({code: 'success'})
             }
         })
-
     }
-
 })
 
 router.post('/deletePicture/:id', function (req, res) {
@@ -228,7 +246,31 @@ router.post('/uploadPicture/:id', function (req, res) {
             res.send({code: 'success', picture: {originalname: picture.originalname, name: picture.name}})
         }
     })
+})
 
+router.post('/deleteProduct/:id', function (req, res) {
+    var id = req.params.id
+    Product.findById(id, function (err, product) {
+        if (err) {
+            console.log(err)
+            res.send({code: 'failed'})
+        } else {
+            var pictures = product.toJSON().pictures
+            if (pictures) {
+                for (var index in pictures) {
+                    fs.unlinkSync(fs.realpathSync('../public/images/') + '/' + pictures[index].name)
+                }
+            }
+            Product.remove(product, function (err) {
+                if (err) {
+                    console.log(err)
+                    res.send({code: 'failed'})
+                } else {
+                    res.send({code: 'success'})
+                }
+            })
+        }
+    })
 })
 
 module.exports = router;

@@ -1,0 +1,56 @@
+extends layout
+block title
+    title!=title
+block nav
+    div(class='navbar-collapse collapse')
+        ul(class='nav navbar-nav pull-right')
+            li.active
+                a(href='/products') 商品列表
+            li
+                a(href='/about') 关于
+block content
+    ol.breadcrumb
+        li.active 商品列表
+    .container
+        form(class='form-inline', method='post', action='/products', id='searchForm')
+            .input-group.col-xs-3
+                select.form-control(id='status',name='status')
+                    option(value='all') 全部
+                    option(value='ongoing') 正在拍卖
+                    option(value='start') 还未开始
+                    option(value='finish') 拍卖结束
+            .input-group.col-xs-9
+                input(type='text', class='form-control', id='search', name='search', placeholder='关键词...')
+                span.input-group-btn
+                    button(type='submit', class='btn btn-primary') 搜索
+    hr
+    table.table(class='table-striped')
+        body
+        each product in products
+            tr.product
+                td
+                    a(href='/product/#{product._id}')
+                        if product.pictures[0]
+                            img(src='/images/#{product.pictures[0].name}', class='img-thumbnail')
+                        else
+                            img(src='/images/150x150.gif', class='img-thumbnail')
+                        .description!=product.description
+                td 起拍价 #{product.startPrice.toFixed(2)}元
+    .text-center
+        ul(id='paginator')
+block append script
+    script(src='/javascripts/bootstrap-paginator.min.js')
+
+    script(type='text/javascript').
+        $(document).ready(function(){
+            $('#status').val('#{status}')
+        })
+        var options = {
+            currentPage: #{currentPage},
+            totalPages: #{totalPages},
+            bootstrapMajorVersion: 3,
+            pageUrl: function (type, page, current) {
+                return "/products/" + page;
+            }
+        }
+        $('#paginator').bootstrapPaginator(options);

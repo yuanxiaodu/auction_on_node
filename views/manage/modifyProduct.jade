@@ -27,6 +27,9 @@ block content
         fieldset
             #modifyProductErr
             .form-group
+                .col-md-11(class='col-md-offset-1')
+                    input(class='file', type='file', id='oldPictures', name='oldPictures')
+            .form-group
                 label(class='control-label col-md-1' for='pictures') 图片
                 .col-md-11
                     input(class='file', type='file', id='pictures', name='pictures', multiple)
@@ -73,6 +76,7 @@ block append script
         });
 
         $(document).ready(function () {
+            $('#oldPictures').fileinput('disable');
             $('#description').cleditor();
             $('#modifyProductForm').ajaxForm(function (responseJSON) {
                 if (responseJSON.code == 'failed') {
@@ -95,43 +99,21 @@ block append script
             config.key = pictures[index].name
             initialPreviewConfig.push(config)
         }
-        $('#pictures').fileinput({
+
+        $('#oldPictures').fileinput({
             uploadUrl: '/manage/uploadPicture/#{product._id}',
             showUpload: false,
-            allowedFileTypes: ['image'],
-            maxFileSize: 1000,
-            maxFileCount: 9,
+            showCaption:false,
+            showRemove:false,
+            dropZoneEnabled:false,
+            browseClass: "oldPicturesButton",
             initialPreview: initialPreview,
-            initialPreviewConfig: initialPreviewConfig,
-            overwriteInitial: false
+            initialPreviewConfig: initialPreviewConfig
         })
 
-        $('#pictures').on('fileuploaderror', function (event, data, previewId, index) {
-            $('button[type="submit"]').attr('disabled', true)
-        });
-
-        $('#pictures').on('fileuploaded', function (event, data, previewId, index) {
-            var picture = data.response.picture
-            var img = '<img src="/images/' + picture.name + '" class="file-preview-image">'
-            initialPreview.push(img)
-            var config = {}
-            config.caption = picture.originalname
-            config.url = "/manage/deletePicture/#{product._id}"
-            config.key = picture.name
-            initialPreviewConfig.push(config)
-        });
-
-        $('#pictures').on('fileclear', function (event) {
-            $('#pictures').fileinput('refresh');
-        });
-
-        $('#pictures').on('fileloaded', function (event, file, previewId, index, reader) {
-            console.log(file)
-        });
-
-
-
-
-
-
-
+        $('#pictures').fileinput({
+            allowedFileTypes: ['image'],
+            maxFileSize: 1000,
+            showUpload: false,
+            maxFileCount: 9
+        })

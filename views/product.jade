@@ -35,11 +35,17 @@ block content
             a.right.carousel-control(href='#pictures', data-slide='next')
                 span.glyphicon.glyphicon-chevron-right(aria-hidden='true')
                 span.sr-only Next
-        p!=product.description
-        h4 当前价 99999
-            small.text-muted ￥#{product.startPrice}
-            small craftsman 出价
-        h4 拍卖状态 2008-99-99
+        div!=product.description
+        if product.bidders.name
+            h4 当前价 #{product.bidders.price.toFixed(2)}元
+                small.text-muted &nbsp;&nbsp;&nbsp;&nbsp;起拍价 #{product.startPrice.toFixed(2)}元
+                small &nbsp;&nbsp;&nbsp;&nbsp;出价人 #{product.bidders.name}
+        else
+            h4 当前价 #{product.startPrice.toFixed(2)}元
+                small.text-muted &nbsp;&nbsp;&nbsp;&nbsp;起拍价 #{product.startPrice.toFixed(2)}元
+                small &nbsp;&nbsp;&nbsp;&nbsp;还没有人出价
+
+        h4#bidStatus
         form(class='form-horizontal', method='post', action='/product/#{product._id}/bid', id='bidForm')
             fieldset
                 #bidErr
@@ -70,4 +76,32 @@ block append script
                     window.location.href = '/product/#{product._id}'
                 }
             })
+
+            var now = new Date();
+            var difference = now.getTime() - #{new Date().getTime()}
+            setInterval(function () {
+                var endTime = #{product.end.getTime()} + difference;
+                var startTime = #{product.start.getTime()} + difference;
+                var nowTime = new Date().getTime();
+                if (startTime > nowTime) {
+                    var nMS = startTime - nowTime;
+                    var myD = Math.floor(nMS / (1000 * 60 * 60 * 24));
+                    var myH = Math.floor(nMS / (1000 * 60 * 60)) % 24;
+                    var myM = Math.floor(nMS / (1000 * 60)) % 60;
+                    var myS = Math.floor(nMS / 1000) % 60;
+                    var str = "还有 " + myD + "天" + myH + "小时" + myM + "分" + myS + "秒 开始";
+                    $("#bidForm").hide();
+                } else if (startTime < nowTime && endTime > nowTime) {
+                    var nMS = endTime - nowTime;
+                    var myD = Math.floor(nMS / (1000 * 60 * 60 * 24));
+                    var myH = Math.floor(nMS / (1000 * 60 * 60)) % 24;
+                    var myM = Math.floor(nMS / (1000 * 60)) % 60;
+                    var myS = Math.floor(nMS / 1000) % 60;
+                    var str = "还有 " + myD + "天" + myH + "小时" + myM + "分" + myS + "秒 结束";
+                } else {
+                    var str = "已结束！";
+                    $("#bidForm").hide();
+                }
+                $("#bidStatus").html(str);
+            }, 1000);
         });

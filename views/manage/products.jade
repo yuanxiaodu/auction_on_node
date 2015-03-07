@@ -34,47 +34,59 @@ block content
         .col-md-3
             a(href='/manage/addProduct', class='btn btn-primary') 添加商品
     hr
-    table.table(class='table-striped')
-        thead
-            tr
-                th 商品描述
-                th 起拍价
-                th 状态
-                th 分类
-                th 更新时间
-                th 操作
-        tbody
-        each product in products
-            tr.product
-                td
-                    a(href='/manage/product/#{product._id}', target='_blank')
-                        if product.pictures[0]
-                            img(src='/images/#{product.pictures[0].name}', class='img-thumbnail')
-                        else
-                            img(src='/images/150x150.gif', class='img-thumbnail')
-                        .description!=product.description
-                td #{product.startPrice.toFixed(2)}元
-                td
-                    if product.status == 0
-                        | 未上架
-                    else if product.status == 1
-                        if product.start > new Date
-                            | 未开始拍卖
-                        else if product.end < new Date
-                            | 已结束拍卖
-                        else
-                            | 正在拍卖
-                td #{product.catalog}
-                td #{product.lastModify.format('yyyy-MM-dd hh:mm')}
-                td
-                    .btn-group
-                        a(href='#', target='_blank', class='btn btn-default') 预览
-                        if product.status == 1
-                            button(type='button', class='btn btn-warning', onclick='changeStatus("#{product._id}", #{product.status})') 下架
-                        else if product.status == 0
-                            button(type='button', class='btn btn-success', onclick='changeStatus("#{product._id}", #{product.status})') 上架
-                        a(href='/manage/modifyProduct/#{product._id}', class='btn btn-info') 编辑
-                        button(type='button', class='btn btn-danger', data-toggle='modal', data-target='#deleteModal', data-productid='#{product._id}') 删除
+    #products.panel-group
+        .panel.panel-default
+            .panel-heading.noSpace
+                h4.panel-title.noSpace
+                    .container.text-center
+                        .col-md-4.noSpace 商品描述
+                        .col-md-1.noSpace 起拍价
+                        .col-md-1.noSpace 状态
+                        .col-md-1.noSpace 分类
+                        .col-md-2.noSpace 更新时间
+                        .col-md-3.noSpace 操作
+        each product, index in products
+            .panel.panel-default
+                .container.noSpace.text-center
+                    .col-md-4.product.noSpace
+                        a(href='#bidder#{index}', data-toggle='collapse', data-parent='#products')
+                            if product.pictures[0]
+                                img(src='/images/#{product.pictures[0].name}', class='img-thumbnail')
+                            else
+                                img(src='/images/150x150.gif', class='img-thumbnail')
+                            .description!=product.description
+                    .col-md-1.noSpace #{product.startPrice.toFixed(2)}元
+                    .col-md-1.noSpace
+                        if product.status == 0
+                            | 未上架
+                        else if product.status == 1
+                            if product.start > new Date
+                                | 未开始拍卖
+                            else if product.end < new Date
+                                | 已结束拍卖
+                            else
+                                | 正在拍卖
+                    .col-md-1.noSpace #{product.catalog}
+                    .col-md-2.noSpace #{product.lastModify.format('yyyy-MM-dd hh:mm')}
+                    .col-md-3.noSpace
+                        .btn-group
+                            a(href='/product/#{product._id}', target='_blank', class='btn btn-default') 预览
+                            if product.status == 1
+                                button(type='button', class='btn btn-warning', onclick='changeStatus("#{product._id}", #{product.status})') 下架
+                            else if product.status == 0
+                                button(type='button', class='btn btn-success', onclick='changeStatus("#{product._id}", #{product.status})') 上架
+                            a(href='/manage/modifyProduct/#{product._id}', class='btn btn-info') 编辑
+                            button(type='button', class='btn btn-danger', data-toggle='modal', data-target='#deleteModal', data-productid='#{product._id}') 删除
+                .collapse.panel-collapse(id='bidder#{index}')
+                    ul.list-group
+                    each bidder in product.bidders
+                        li.list-group-item(id='#{bidder._id}')
+                            .container
+                                .col-md-6.noSpace
+                                    #{bidder.name} #{bidder.bidTime.format('yyyy-MM-dd hh:mm')} 出价 #{bidder.price.toFixed(2)}元，联系电话 #{bidder.phone}
+                                .col-md-2
+                                    button.btn.btn-primary(type='button',onclick='delBidder("#{bidder._id}")')
+                                        span(class='glyphicon glyphicon-remove', aria-hidden='true') 删除
     .text-center
         ul(id='paginator')
     //删除确认对话框
@@ -92,7 +104,7 @@ block append script
     script(src='/javascripts/bootstrap-paginator.min.js')
 
     script(type='text/javascript').
-        $(document).ready(function(){
+        $(document).ready(function () {
             $('#status').val('#{status}')
         })
 
@@ -130,3 +142,13 @@ block append script
                 }
             })
         })
+
+        function delBidder(id) {
+            $.post('/manage/delBidder/' + id, function (responseJSON) {
+                if (responseJSON.code == 'failed') {
+                    alert('服务器错误')
+                } else if (responseJSON.code == 'success') {
+                    $('#'+id).remove()
+                }
+            })
+        }

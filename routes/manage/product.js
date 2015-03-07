@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var mongoose = require('mongoose');
 var fs = require('fs');
 var Product = require('../../models/Product');
 
@@ -269,6 +270,21 @@ router.post('/deleteProduct/:id', function (req, res) {
                     res.send({code: 'success'})
                 }
             })
+        }
+    })
+})
+
+router.post('/delBidder/:id', function (req, res) {
+    var id = mongoose.Types.ObjectId(req.params.id)
+    Product.findOneAndUpdate({'bidders._id': id}, {
+        $pull: {bidders: {_id: id}},
+        lastModify: new Date,
+        modifier: req.session.user.username
+    }, function (err) {
+        if (err) {
+            console.log(err)
+        } else {
+            res.send({code: 'success'})
         }
     })
 })

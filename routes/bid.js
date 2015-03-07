@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var mongoose = require('mongoose');
 var Product = require('../models/Product');
 
 var pageSize = 10;
@@ -59,14 +60,98 @@ router.all('/products(/:page)?', function (req, res) {
 })
 
 router.get('/product/:id', function (req, res) {
-    var id = req.params.id
-    Product.findById(id, function (err, product) {
+    Product.findById(req.params.id, function (err, product) {
         if (err) {
             console.log(err)
         } else {
-            res.render('product', {title: '竞拍商品', product: product});
+            if (product.bidders.length) {
+                Product.aggregate([
+                    {$match: {_id: mongoose.Types.ObjectId(req.params.id)}},
+                    {$unwind: '$bidders'},
+                    {$sort: {'bidders.price': -1}}
+                ], function (err, doc) {
+                    if (err) {
+                        console.log(err)
+                    } else {
+                        res.render('product', {title: '竞拍商品', product: doc[0]});
+                    }
+                })
+            } else {
+                res.render('product', {title: '竞拍商品', product: product});
+            }
         }
     })
+})
+
+router.post('/product/:id/bid', function (req, res) {
+    var price = req.body.price,
+        name = req.body.name,
+        phone = req.body.phone
+    if (!/^[1-9]{1}[0-9]{0,10}[.]{0,1}[0-9]{0,2}$/.test(price)) {
+        res.send({code: 'failed', msg: '价格格式为 XX.XX'})
+    } else if (!/(^(([0\+]\d{2,3}-)?(0\d{2,3})-)(\d{7,8})(-(\d{3,}))?$)|(^0{0,1}1[3|4|5|6|7|8|9][0-9]{9}$)/.test(phone)) {
+        res.send({code: 'failed', msg: '电话号码格式不正确'})
+    } else {
+        Product.findById(req.params.id, function (err, product) {
+            if (err) {
+                console.log(err)
+            } else {
+                if (product.bidders.length) {
+                    Product.aggregate([
+                        {$match: {_id: mongoose.Types.ObjectId(req.params.id)}},
+                        {$unwind: '$bidders'},
+                        {$sort: {'bidders.price': -1}}
+                    ], function (err, doc) {
+                        if (err) {
+                            console.log(err)
+                        } else {
+                            if (price < doc[0].bidders.price) {
+                                res.send({code: 'failed', msg: '出价太低'})
+                            } else {
+                                Product.findByIdAndUpdate(req.params.id, {
+                                    $push: {
+                                        bidders: {
+                                            name: name,
+                                            phone: phone,
+                                            price: price,
+                                            bidTime: new Date
+                                        }
+                                    }
+                                }, function (err) {
+                                    if (err) {
+                                        console.log(err)
+                                    } else {
+                                        res.send({code: 'success'})
+                                    }
+                                })
+                            }
+                        }
+                    })
+                } else {
+                    if (price < product.startPrice) {
+                        res.send({code: 'failed', msg: '出价太低'})
+                    } else {
+                        Product.findByIdAndUpdate(req.params.id, {
+                            $push: {
+                                bidders: {
+                                    name: name,
+                                    phone: phone,
+                                    price: price,
+                                    bidTime: new Date
+                                }
+                            }
+                        }, function (err) {
+                            if (err) {
+                                console.log(err)
+                            } else {
+                                res.send({code: 'success'})
+                            }
+                        })
+                    }
+                }
+            }
+        })
+    }
 })
 
 module.exports = router;

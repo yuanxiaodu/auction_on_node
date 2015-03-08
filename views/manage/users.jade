@@ -31,10 +31,10 @@ block content
             hr
             ul(class='list-group', id='users')
                 each user in users
-                    li.list-group-item
+                    li.list-group-item(data-userid='#{user._id}')
                         span(class='glyphicon glyphicon-user', aria-hidden='true')
                         | #{user.username}
-                        a(class='pull-right', href='javascript:delUser("#{user.username}")')
+                        a(class='pull-right delUser', href='#')
                             span(class='glyphicon glyphicon-remove', aria-hidden='true')
                             | 删除
 block append script
@@ -55,14 +55,17 @@ block append script
                 }
             })
         });
-        function delUser(username) {
-            $.post('/manage/delUser', {username: username}, function (responseJSON) {
+
+        $('.delUser').click(function () {
+            var $li = $(this).parent()
+            var id = $li.data('userid')
+            $.get('/manage/delUser/' + id, function (responseJSON) {
                 if (responseJSON.code == 'failed') {
                     $('#userErr').html(responseJSON.msg).addClass('alert alert-danger')
                 } else if (responseJSON.code == 'success') {
-                    $('#users li:contains(' + username + ')').remove();
+                    $li.remove();
                     $('#userErr').empty()
                     $('#userErr').removeClass()
                 }
             })
-        }
+        })

@@ -80,12 +80,12 @@ block content
                 .collapse.panel-collapse(id='bidder#{index}')
                     ul.list-group
                     each bidder in product.bidders
-                        li.list-group-item(id='#{bidder._id}')
+                        li.list-group-item(data-bidderid='#{bidder._id}')
                             .container
                                 .col-md-6.noSpace
-                                    #{bidder.name} #{bidder.bidTime.format('yyyy-MM-dd hh:mm')} 出价 #{bidder.price.toFixed(2)}元，联系电话 #{bidder.phone}
+                                    | #{bidder.name} #{bidder.bidTime.format('yyyy-MM-dd hh:mm')} 出价 #{bidder.price.toFixed(2)}元，联系电话 #{bidder.phone}
                                 .col-md-2
-                                    button.btn.btn-primary(type='button',onclick='delBidder("#{bidder._id}")')
+                                    button.btn.btn-primary.delBidder(type='button')
                                         span(class='glyphicon glyphicon-remove', aria-hidden='true') 删除
     .text-center
         ul(id='paginator')
@@ -134,7 +134,7 @@ block append script
 
         $('#deleteButton').click(function () {
             var id = $(this).data('productid')
-            $.post('/manage/deleteProduct/' + id, function (responseJSON) {
+            $.get('/manage/deleteProduct/' + id, function (responseJSON) {
                 if (responseJSON.code == 'failed') {
                     alert('服务器错误')
                 } else if (responseJSON.code == 'success') {
@@ -143,12 +143,14 @@ block append script
             })
         })
 
-        function delBidder(id) {
-            $.post('/manage/delBidder/' + id, function (responseJSON) {
+        $('.delBidder').click(function () {
+            var $li = $(this).parent().parent().parent()
+            var id = $li.data('bidderid')
+            $.get('/manage/delBidder/' + id, function (responseJSON) {
                 if (responseJSON.code == 'failed') {
                     alert('服务器错误')
                 } else if (responseJSON.code == 'success') {
-                    $('#'+id).remove()
+                    $li.remove()
                 }
             })
-        }
+        })

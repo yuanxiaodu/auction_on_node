@@ -1,6 +1,5 @@
 var express = require('express');
 var router = express.Router();
-
 var User = require('../../models/User');
 
 router.get('/user', function (req, res) {
@@ -76,11 +75,11 @@ router.post('/addUser', function (req, res) {
     }
 });
 
-router.post('/delUser', function (req, res) {
+router.get('/delUser/:id', function (req, res) {
     if (req.session.user.type != 1) {
         res.redirect('/manage/user');
     } else {
-        User.findOneAndRemove({username: req.body.username}, function (err, user) {
+        User.findByIdAndRemove(req.params.id, function (err) {
             if (err) {
                 console.log(err)
                 res.send({code: 'failed', msg: '数据库错误'})

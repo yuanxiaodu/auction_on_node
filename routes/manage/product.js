@@ -239,7 +239,7 @@ router.post('/uploadPicture/:id', function (req, res) {
         $push: {pictures: {originalname: picture.originalname, name: picture.name}},
         lastModify: new Date,
         modifier: req.session.user.username
-    }, function (err, product) {
+    }, function (err) {
         if (err) {
             console.log(err)
         } else {
@@ -249,7 +249,7 @@ router.post('/uploadPicture/:id', function (req, res) {
     })
 })
 
-router.post('/deleteProduct/:id', function (req, res) {
+router.get('/deleteProduct/:id', function (req, res) {
     var id = req.params.id
     Product.findById(id, function (err, product) {
         if (err) {
@@ -274,7 +274,7 @@ router.post('/deleteProduct/:id', function (req, res) {
     })
 })
 
-router.post('/delBidder/:id', function (req, res) {
+router.get('/delBidder/:id', function (req, res) {
     var id = mongoose.Types.ObjectId(req.params.id)
     Product.findOneAndUpdate({'bidders._id': id}, {
         $pull: {bidders: {_id: id}},

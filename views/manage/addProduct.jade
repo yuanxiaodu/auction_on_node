@@ -11,6 +11,8 @@ block nav
         ul(class='nav navbar-nav pull-right')
             li.active
                 a(href='/manage/products') 商品管理
+            li
+                a(href='/manage/pictures') 图片管理
             if user.type == 1
                 li
                     a(href='/manage/users') 用户管理
@@ -56,7 +58,6 @@ block content
             .form-group
                 div(class='col-md-offset-1 col-md-3')
                     button(type='submit', class='btn btn-primary') 提交
-
 
 block append script
     script(src='/javascripts/jquery.form.min.js')

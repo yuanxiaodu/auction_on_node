@@ -26,32 +26,3 @@ body {
 .text-muted {
     margin: 20px 0;
 }
-
-.product {
-}
-
-.product a {
-    text-decoration: none;
-}
-
-.product img {
-    float: left;
-    width: 150px;
-}
-
-.description {
-    float: left;
-    width: 150px;
-    height: 7em;
-    word-wrap: break-word;
-    word-break: normal;
-    overflow: hidden;
-}
-
-.oldPicturesButton {
-    display: none;
-}
-
-.noSpace {
-    padding: 5px 0px;
-}

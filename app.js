@@ -10,6 +10,7 @@ var multer = require('multer')
 var login = require('./routes/manage/login');
 var user = require('./routes/manage/user');
 var product = require('./routes/manage/product');
+var picture = require('./routes/manage/picture');
 var bid = require('./routes/bid');
 
 var app = express();
@@ -44,6 +45,7 @@ app.use(session(sess))
 app.use('/manage', login);
 app.use('/manage', user);
 app.use('/manage', product);
+app.use('/manage', picture);
 app.use('/', bid);
 
 // catch 404 and forward to error handler

@@ -13,7 +13,7 @@ router.all('/products(/:page)?', function (req, res) {
     var page = req.params.page || '/1'
     page = page.substr(1)
     var total = 0
-    var search = req.body.search
+    var search = req.body.search || req.query.search
     var status = req.body.status || 'ongoing'
     var condition = {status: 1}
     if (search) {
@@ -33,7 +33,7 @@ router.all('/products(/:page)?', function (req, res) {
             break
         default :
     }
-    Product.count(function (err, count) {
+    Product.count(condition, function (err, count) {
         if (err) {
             console.log(err)
         } else {
@@ -48,6 +48,7 @@ router.all('/products(/:page)?', function (req, res) {
                 } else {
                     res.render('products', {
                         title: '商品列表',
+                        search: search,
                         status: status,
                         products: products,
                         currentPage: page,
@@ -73,11 +74,11 @@ router.get('/product/:id', function (req, res) {
                     if (err) {
                         console.log(err)
                     } else {
-                        res.render('product', {title: '竞拍商品', product: doc[0]});
+                        res.render('product', {title: '竞拍商品', product: doc[0], bidnum: product.bidders.length});
                     }
                 })
             } else {
-                res.render('product', {title: '竞拍商品', product: product});
+                res.render('product', {title: '竞拍商品', product: product, bidnum: 1});
             }
         }
     })

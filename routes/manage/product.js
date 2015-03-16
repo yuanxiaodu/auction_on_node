@@ -9,7 +9,7 @@ router.all('/products(/:page)?', function (req, res) {
     var page = req.params.page || '/1'
     page = page.substr(1)
     var total = 0
-    var search = req.body.search
+    var search = req.body.search || req.query.search
     var status = req.body.status || 'all'
     var condition = {}
 
@@ -36,7 +36,7 @@ router.all('/products(/:page)?', function (req, res) {
             break
         default :
     }
-    Product.count(function (err, count) {
+    Product.count(condition, function (err, count) {
         if (err) {
             console.log(err)
         } else {
@@ -52,6 +52,7 @@ router.all('/products(/:page)?', function (req, res) {
                     res.render('manage/products', {
                         title: '商品管理',
                         status: status,
+                        search: search,
                         user: req.session.user,
                         products: products,
                         currentPage: page,

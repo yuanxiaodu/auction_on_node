@@ -5,12 +5,17 @@ block append css
     link(rel='stylesheet', href='/stylesheets/bootstrap-datetimepicker.min.css')
     link(rel='stylesheet', href='/stylesheets/jquery.cleditor.css')
     link(rel='stylesheet', href='/stylesheets/fileinput.min.css')
-
+    style.
+        .oldPicturesButton {
+            display: none;
+        }
 block nav
     div(class='navbar-collapse collapse')
         ul(class='nav navbar-nav pull-right')
             li.active
                 a(href='/manage/products') 商品管理
+            li
+                a(href='/manage/pictures') 图片管理
             if user.type == 1
                 li
                     a(href='/manage/users') 用户管理

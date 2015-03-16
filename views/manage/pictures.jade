@@ -1,0 +1,181 @@
+extends ../layout
+block title
+    title!=title
+block append css
+    link(rel='stylesheet', href='/stylesheets/fileinput.min.css')
+    link(rel='stylesheet', href='/stylesheets/magnific-popup.css')
+    style.
+        .image-gallery {
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .image-gallery a {
+            position: relative;
+            float: left;
+            text-decoration: none;
+        }
+
+        .deletePicture {
+            position: absolute;
+            left: 15px;
+            top: 15px;
+        }
+
+        .copyUrl {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+        }
+
+block nav
+    div(class='navbar-collapse collapse')
+        ul(class='nav navbar-nav pull-right')
+            li
+                a(href='/manage/products') 商品管理
+            li.active
+                a(href='/manage/pictures') 图片管理
+            if user.type == 1
+                li
+                    a(href='/manage/users') 用户管理
+            li
+                a(href='/manage/user') 资料管理
+            li
+                a(href='/manage/logout') 注销
+block content
+    ol.breadcrumb
+        li.active!=title
+    .container
+        .col-md-6
+            form(class='form-inline', method='post', action='/manage/pictures')
+                .input-group.col-md-12
+                    input(type='text', class='form-control', name='search', placeholder='关键词...')
+                    span.input-group-btn
+                        button(type='submit', class='btn btn-primary') 搜索
+        .col-md-3
+            button(type='button', class='btn btn-primary', data-toggle='modal', data-target='#addPictureModal') 添加图片
+    hr
+    .image-gallery
+        each picture in pictures
+            a.picture(href='/images/#{picture.name}', title='#{picture.originalname}')
+                span.deletePicture.glyphicon.glyphicon-trash(data-id='#{picture._id}', title='删除图片')
+                span.copyUrl.glyphicon.glyphicon-file(title='复制图片地址')
+                img.img-thumbnail.mfp-zoom(src='/images/#{picture.name}', width='150')
+                p #{picture.description}
+    .text-center
+        ul(id='paginator')
+
+    #addPictureModal.modal.fade(tabindex='-1', aria-labelledby='addPictureModalLabel', aria-hidden='true')
+        .modal-dialog
+            .modal-content
+                .modal-header
+                    button.close(type='button', data-dismiss='modal', aria-hidden='true') &times;
+                    h4.modal-title 添加图片
+                .modal-body
+                    form(method='post', action='/manage/addPicture', enctype='multipart/form-data', id='addPictureForm')
+                        #addPictureErr
+                        .form-group
+                            label.control-label(for='picture') 图片
+                            input.file(type='file', name='picture', id='picture', required)
+                        .form-group
+                            label.control-label(for='description') 描述
+                            textarea.form-control(name='description', id='description')
+                .modal-footer
+                    button.btn.btn-default(type='button', data-dismiss='modal') 关闭
+                    button#addPictureButton.btn.btn-primary(type='submit', form='addPictureForm') 提交
+
+    #deletePictureModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='deletePictureModalLabel', aria-hidden='true')
+        .modal-dialog
+            .modal-content
+                .modal-header
+                    button.close(type='button', data-dismiss='modal', aria-hidden='true') &times;
+                    h4.modal-title 确认删除？
+                .modal-body 删除图片不可恢复，所有引用该图片的内容将无法正确显示
+                .modal-footer
+                    button.btn.btn-default(type='button', data-dismiss='modal') 关闭
+                    button#deletePictureButton.btn.btn-primary(type='button') 删除
+
+    #copyUrlModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='copyUrlModalLabel', aria-hidden='true')
+        .modal-dialog
+            .modal-content
+                .modal-header
+                    button.close(type='button', data-dismiss='modal', aria-hidden='true') &times;
+                    h4.modal-title 复制图片地址
+                .modal-body
+                .modal-footer
+                    button.btn.btn-default(type='button', data-dismiss='modal') 关闭
+block append script
+    script(src='/javascripts/bootstrap-paginator.min.js')
+    script(src='/javascripts/jquery.form.min.js')
+    script(src='/javascripts/fileinput.min.js')
+    script(src='/javascripts/jquery.magnific-popup.min.js')
+    script(type='text/javascript').
+        var options = {
+            currentPage: #{currentPage},
+            totalPages: #{totalPages},
+            bootstrapMajorVersion: 3,
+            pageUrl: function (type, page) {
+                return "/manage/pictures/" + page + '?search=#{search}';
+            }
+        }
+        $('#paginator').bootstrapPaginator(options);
+
+        $('#addPictureForm').ajaxForm(function (responseJSON) {
+            if (responseJSON.code == 'failed') {
+                $('#addPictureErr').html(responseJSON.msg).addClass('alert alert-danger')
+            } else if (responseJSON.code == 'success') {
+                window.location.href = '/manage/pictures'
+            }
+        })
+
+        $('#picture').fileinput({
+            allowedFileTypes: ['image'],
+            maxFileSize: 1000,
+            showUpload: false
+        })
+
+        $(document).ready(function () {
+            $('.image-gallery').magnificPopup({
+                delegate: 'a',
+                type: 'image',
+                mainClass: 'mfp-with-zoom mfp-img-mobile',
+                closeOnContentClick: true,
+                closeBtnInside: false,
+                image: {
+                    titleSrc: function (item) {
+                        return item.el.children('p').text();
+                    }
+                },
+                zoom: {
+                    enabled: true
+                }
+            });
+        });
+
+        $('.deletePicture').click(function () {
+            $(".modal-footer #deletePictureButton").data('id', $(this).data('id'));
+            $('#deletePictureModal').modal('show')
+            return false
+        })
+
+        $('.copyUrl').click(function () {
+            var url = 'http://' + window.location.host + $(this).parent().attr('href')
+            $('#copyUrlModal .modal-body').text(url)
+            $('#copyUrlModal').modal('show')
+            return false
+        })
+
+        $('#deletePictureButton').click(function() {
+            var id = $(this).data('id')
+            $.get('/manage/deletePicture/' + id, function (responseJSON) {
+                if (responseJSON.code == 'failed') {
+                    alert('服务器错误')
+                } else if (responseJSON.code == 'success') {
+                    window.location.href = '/manage/pictures'
+                }
+            })
+        })
+
+
+
+

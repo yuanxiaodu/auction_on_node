@@ -49,8 +49,8 @@ block append script
             currentPage: #{currentPage},
             totalPages: #{totalPages},
             bootstrapMajorVersion: 3,
-            pageUrl: function (type, page, current) {
-                return "/products/" + page;
+            pageUrl: function (type, page) {
+                return "/products/" + page + '?search=#{search}';
             }
         }
         $('#paginator').bootstrapPaginator(options);

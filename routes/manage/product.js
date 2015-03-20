@@ -69,7 +69,8 @@ router.get('/addProduct', function (req, res) {
 })
 
 router.post('/addProduct', function (req, res) {
-    var files = req.files.pictures,
+    var title = req.body.title,
+        files = req.files.pictures,
         startPrice = req.body.startPrice,
         markup = req.body.markup,
         start = new Date(req.body.start),
@@ -93,24 +94,25 @@ router.post('/addProduct', function (req, res) {
     } else {
         var pictures = new Array()
         for (var index in files) {
-            fs.renameSync(files[index].path, fs.realpathSync('../public/images/') + '/' + files[index].name)
+            fs.renameSync(files[index].path, fs.realpathSync('./public/images/') + '/' + files[index].name)
             pictures.push({
                 originalname: files[index].originalname,
                 name: files[index].name
             })
         }
         var product = new Product({
-            pictures: pictures,
-            startPrice: startPrice,
-            markup: markup,
-            start: start,
-            end: end,
-            catalog: catalog,
-            description: description,
-            status: 0,
-            lastModify: new Date,
-            modifier: req.session.user.username
-        })
+                title: title,
+                pictures: pictures,
+                startPrice: startPrice,
+                markup: markup,
+                start: start,
+                end: end,
+                catalog: catalog,
+                description: description,
+                status: 0,
+                lastModify: new Date,
+                modifier: req.session.user.username
+            })
         product.save(function (err) {
             if (err) {
                 console.log(err)
@@ -152,7 +154,8 @@ router.get('/modifyProduct/:id', function (req, res) {
 
 router.post('/modifyProduct/:id', function (req, res) {
     var id = req.params.id
-    var files = req.files.pictures,
+    var title = req.body.title,
+        files = req.files.pictures,
         startPrice = req.body.startPrice,
         markup = req.body.markup,
         start = new Date(req.body.start),
@@ -182,7 +185,7 @@ router.post('/modifyProduct/:id', function (req, res) {
     } else {
         if (files) {
             for (var index in files) {
-                fs.renameSync(files[index].path, fs.realpathSync('../public/images/') + '/' + files[index].name)
+                fs.renameSync(files[index].path, fs.realpathSync('./public/images/') + '/' + files[index].name)
                 Product.findByIdAndUpdate(id, {
                     $push: {
                         pictures: {
@@ -198,6 +201,7 @@ router.post('/modifyProduct/:id', function (req, res) {
             }
         }
         Product.findByIdAndUpdate(id, {
+            title: title,
             startPrice: startPrice,
             markup: markup,
             start: start,
@@ -227,7 +231,7 @@ router.post('/deletePicture/:id', function (req, res) {
         if (err) {
             console.log(err)
         } else {
-            fs.unlinkSync(fs.realpathSync('../public/images/') + '/' + name)
+            fs.unlinkSync(fs.realpathSync('./public/images/') + '/' + name)
             res.send({code: 'success'})
         }
     })
@@ -244,7 +248,7 @@ router.post('/uploadPicture/:id', function (req, res) {
         if (err) {
             console.log(err)
         } else {
-            fs.renameSync(picture.path, fs.realpathSync('../public/images/') + '/' + picture.name)
+            fs.renameSync(picture.path, fs.realpathSync('./public/images/') + '/' + picture.name)
             res.send({code: 'success', picture: {originalname: picture.originalname, name: picture.name}})
         }
     })
@@ -260,7 +264,7 @@ router.get('/deleteProduct/:id', function (req, res) {
             var pictures = product.toJSON().pictures
             if (pictures) {
                 for (var index in pictures) {
-                    fs.unlinkSync(fs.realpathSync('../public/images/') + '/' + pictures[index].name)
+                    fs.unlinkSync(fs.realpathSync('./public/images/') + '/' + pictures[index].name)
                 }
             }
             Product.remove(product, function (err) {

@@ -1,6 +1,27 @@
 extends layout
 block title
     title!=title
+    style.
+        .product {
+        }
+
+        .product a {
+            text-decoration: none;
+        }
+
+        .product img {
+            float: left;
+            width: 150px;
+        }
+
+        .title {
+            float: left;
+            width: 150px;
+            height: 7em;
+            word-wrap: break-word;
+            word-break: normal;
+            overflow: hidden;
+        }
 block nav
     div(class='navbar-collapse collapse')
         ul(class='nav navbar-nav pull-right')
@@ -34,7 +55,7 @@ block content
                             img(src='/images/#{product.pictures[0].name}', class='img-thumbnail')
                         else
                             img(src='/images/150x150.gif', class='img-thumbnail')
-                        .description!=product.description
+                        .title!=product.title
                 td 起拍价 #{product.startPrice.toFixed(2)}元
     .text-center
         ul(id='paginator')
@@ -42,7 +63,7 @@ block append script
     script(src='/javascripts/bootstrap-paginator.min.js')
 
     script(type='text/javascript').
-        $(document).ready(function(){
+        $(document).ready(function () {
             $('#status').val('#{status}')
         })
         var options = {

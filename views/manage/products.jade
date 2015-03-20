@@ -1,6 +1,7 @@
 extends ../layout
 block title
     title!=title
+block append css
     style.
         .product {
         }
@@ -14,7 +15,7 @@ block title
             width: 150px;
         }
 
-        .description {
+        .title {
             float: left;
             width: 150px;
             height: 7em;
@@ -66,7 +67,7 @@ block content
             .panel-heading.noSpace
                 h4.panel-title.noSpace
                     .container.text-center
-                        .col-md-4.noSpace 商品描述
+                        .col-md-4.noSpace 商品
                         .col-md-1.noSpace 起拍价
                         .col-md-1.noSpace 状态
                         .col-md-1.noSpace 分类
@@ -81,7 +82,7 @@ block content
                                 img(src='/images/#{product.pictures[0].name}', class='img-thumbnail')
                             else
                                 img(src='/images/150x150.gif', class='img-thumbnail')
-                            .description!=product.description
+                            .title!=product.title
                     .col-md-1.noSpace #{product.startPrice.toFixed(2)}元
                     .col-md-1.noSpace
                         if product.status == 0

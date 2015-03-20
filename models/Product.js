@@ -6,6 +6,7 @@ var Schema = mongodb.mongoose.Schema;
 var Picture = require('../models/Picture');
 
 var ProductSchema = new Schema({
+    title: String,
     pictures: [{
         originalname: String,
         name: String

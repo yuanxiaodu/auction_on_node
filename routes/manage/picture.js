@@ -52,7 +52,7 @@ router.post('/addPicture', function (req, res) {
             description: req.body.description || '',
             lastModify: new Date
         })
-        fs.renameSync(file.path, fs.realpathSync('../public/images/') + '/' + file.name)
+        fs.renameSync(file.path, fs.realpathSync('./public/images/') + '/' + file.name)
         picture.save(function (err) {
             if (err) {
                 console.log(err)
@@ -69,7 +69,7 @@ router.get('/deletePicture/:id', function (req, res) {
         if (err) {
             console.log(err)
         } else {
-            fs.unlinkSync(fs.realpathSync('../public/images/') + '/' + picture.name)
+            fs.unlinkSync(fs.realpathSync('./public/images/') + '/' + picture.name)
             Picture.remove(picture, function (err) {
                 if (err) {
                     console.log(err)

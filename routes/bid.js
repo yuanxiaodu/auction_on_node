@@ -65,6 +65,10 @@ router.get('/product/:id', function (req, res) {
         if (err) {
             console.log(err)
         } else {
+            var price = req.cookies.price || '',
+                name = req.cookies.name || '',
+                phone = req.cookies.phone || ''
+            console.log(req.cookies)
             if (product.bidders.length) {
                 Product.aggregate([
                     {$match: {_id: mongoose.Types.ObjectId(req.params.id)}},
@@ -74,11 +78,23 @@ router.get('/product/:id', function (req, res) {
                     if (err) {
                         console.log(err)
                     } else {
-                        res.render('product', {title: '竞拍商品', product: doc[0], bidnum: product.bidders.length});
+                        res.render('product', {
+                            title: '竞拍商品',
+                            product: doc[0],
+                            bidnum: product.bidders.length,
+                            price: price,
+                            name: name,
+                            phone: phone
+                        });
                     }
                 })
             } else {
-                res.render('product', {title: '竞拍商品', product: product, bidnum: 1});
+                res.render('product', {
+                    title: '竞拍商品', product: product, bidnum: 1,
+                    price: price,
+                    name: name,
+                    phone: phone
+                });
             }
         }
     })
@@ -106,7 +122,7 @@ router.post('/product/:id/bid', function (req, res) {
                         if (err) {
                             console.log(err)
                         } else {
-                            if (price < doc[0].bidders.price) {
+                            if (price <= doc[0].bidders.price) {
                                 res.send({code: 'failed', msg: '出价太低'})
                             } else {
                                 Product.findByIdAndUpdate(req.params.id, {
@@ -122,6 +138,22 @@ router.post('/product/:id/bid', function (req, res) {
                                     if (err) {
                                         console.log(err)
                                     } else {
+                                        var week = 7 * 24 * 3600000
+                                        res.cookie('price', price, {
+                                            path: '/product',
+                                            expires: new Date(Date.now() + week),
+                                            maxAge: week
+                                        })
+                                        res.cookie('name', name, {
+                                            path: '/product',
+                                            expires: new Date(Date.now() + week),
+                                            maxAge: week
+                                        })
+                                        res.cookie('phone', phone, {
+                                            path: '/product',
+                                            expires: new Date(Date.now() + week),
+                                            maxAge: week
+                                        })
                                         res.send({code: 'success'})
                                     }
                                 })
@@ -129,7 +161,7 @@ router.post('/product/:id/bid', function (req, res) {
                         }
                     })
                 } else {
-                    if (price < product.startPrice) {
+                    if (price <= product.startPrice) {
                         res.send({code: 'failed', msg: '出价太低'})
                     } else {
                         Product.findByIdAndUpdate(req.params.id, {
@@ -145,6 +177,22 @@ router.post('/product/:id/bid', function (req, res) {
                             if (err) {
                                 console.log(err)
                             } else {
+                                var week = 7 * 24 * 3600000
+                                res.cookie('price', price, {
+                                    path: '/product',
+                                    expires: new Date(Date.now() + week),
+                                    maxAge: week
+                                })
+                                res.cookie('name', name, {
+                                    path: '/product',
+                                    expires: new Date(Date.now() + week),
+                                    maxAge: week
+                                })
+                                res.cookie('phone', phone, {
+                                    path: '/product',
+                                    expires: new Date(Date.now() + week),
+                                    maxAge: week
+                                })
                                 res.send({code: 'success'})
                             }
                         })

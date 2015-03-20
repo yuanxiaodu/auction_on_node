@@ -14,6 +14,7 @@ block content
             a(href='/products') 商品列表
         li.active!=title
     .container
+        div=product.title
         #pictures.carousel.slide
             ol.carousel-indicators
                 each picture, index in product.pictures
@@ -35,7 +36,6 @@ block content
             a.right.carousel-control(href='#pictures', data-slide='next')
                 span.glyphicon.glyphicon-chevron-right(aria-hidden='true')
                 span.sr-only Next
-        div!=product.description
         if product.bidders.name
             h4 当前价 #{product.bidders.price.toFixed(2)}元
                 small.text-muted &nbsp;&nbsp;&nbsp;&nbsp;起拍价 #{product.startPrice.toFixed(2)}元
@@ -53,15 +53,15 @@ block content
                 .form-group
                     label(class='control-label col-xs-3' for='price') 出价
                     .col-xs-9
-                        input(type='text', class='form-control', id='price', name='price', required)
+                        input(type='text', class='form-control', id='price', name='price', required,value='#{price}')
                 .form-group
                     label(class='control-label col-xs-3' for='name') 姓名
                     .col-xs-9
-                        input(type='text', class='form-control', id='name', name='name', required)
+                        input(type='text', class='form-control', id='name', name='name', required,value='#{name}')
                 .form-group
                     label(class='control-label col-xs-3' for='phone') 手机
                     .col-xs-9
-                        input(type='text', class='form-control', id='phone', name='phone', required=)
+                        input(type='text', class='form-control', id='phone', name='phone', required,value='#{phone}')
                 .form-group
                     .col-xs-9.col-xs-offset-3
                         button(type='submit', class='btn btn-primary') 立即出价
